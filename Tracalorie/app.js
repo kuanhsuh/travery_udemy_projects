@@ -1,5 +1,30 @@
 // Storage Controller
-
+const StorageCtrl = (() => {
+    return {
+        storeItem(item) {
+            let items = []
+            if (localStorage.getItem('items') === null) {
+                items = []
+                items.push(item)
+                localStorage.setItem('items', JSON.stringify(items))
+            } else {
+                items = JSON.parse(localStorage.getItem('items'))
+                items.push(item)
+                localStorage.setItem('items', JSON.stringify(items))
+            }
+            
+        },
+        getItemsFromStorage() {
+            let items
+            if(localStorage.getItem('items') === null) {
+                items = []
+            } else {
+                items = JSON.parse(localStorage.getItem('items'))
+            }
+            return items
+        }
+    }
+})()
 // Item Controller
 const ItemCtrl = (() => {
     // Item Contructor
@@ -11,11 +36,12 @@ const ItemCtrl = (() => {
 
     // Data Structure / State
     const data = {
-        items: [
+        // items: [
             // {id: 0, name: 'Steak Dinner', calories: 1200},
             // {id: 1, name: 'Cookies', calories: 400},
             // {id: 2, name: 'Eggs', calories: 300},
-        ],
+        // ],
+        items: StorageCtrl.getItemsFromStorage(),
         currentItem: null,
         totalCalories: 0
     }
@@ -194,7 +220,7 @@ const UICtrl = (() => {
 })()
 
 // App Controller
-const App = ((ItemCtrl, UICtrl) => {
+const App = ((ItemCtrl, UICtrl, StorageCtrl) => {
     // Load Event Listeners
     const loadEventListeners = () => {
         // Get UI selectors
@@ -237,6 +263,8 @@ const App = ((ItemCtrl, UICtrl) => {
             const totalCalories = ItemCtrl.getTotalCalories()
             //Add total calories to UI
             UICtrl.showTotalCalories(totalCalories)
+            // Store in localStorage
+            StorageCtrl.storeItem(newItem)
             // clear fields
             UICtrl.clearInput()
         }
@@ -315,7 +343,7 @@ const App = ((ItemCtrl, UICtrl) => {
             loadEventListeners()
         }
     }
-})(ItemCtrl, UICtrl)
+})(ItemCtrl, UICtrl, StorageCtrl)
 
 // Init app
 App.init()
