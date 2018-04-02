@@ -86,7 +86,11 @@ var UIController = (() => {
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expensesContainer: '.expenses__list'
+        expensesContainer: '.expenses__list',
+        budgetLabel: '.budget__value',
+        incomeLabel: '.budget__income--value',
+        expensesLabel: '.budget__expenses--value',
+        percentagelabel: '.budget__expenses--percentage'
     }
     return {
         getinput() {
@@ -97,7 +101,7 @@ var UIController = (() => {
             }
         },
         addListItem(obj, type) {
-            var html, newHtml
+            var html, newHtml, element
             // Create HTML string with placeholder text
             if (type === 'inc') {
                 element = DOMstrings.incomeContainer
@@ -124,6 +128,18 @@ var UIController = (() => {
             });
             fieldsArr[0].focus()
         },
+        displayBudget(obj) {
+            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget
+            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc
+            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp
+            document.querySelector(DOMstrings.percentagelabel).textContent = obj.percentage
+
+            if (obj.percentage > 0) {
+                document.querySelector(DOMstrings.percentagelabel).textContent = obj.percentage + '%'
+            } else {
+                document.querySelector(DOMstrings.percentagelabel).textContent = '---'
+            }
+        },
         getDOMstrings() {
             return DOMstrings
         }
@@ -149,7 +165,7 @@ var controller = ((budgetCtrl, UICtrl) => {
         // 2. Return the budget
         var budget = budgetCtrl.getBudget()
         // 3. Display the budget on the UI
-        console.log(budget)
+        UICtrl.displayBudget(budget)
     }
 
 
@@ -173,6 +189,12 @@ var controller = ((budgetCtrl, UICtrl) => {
     return {
         init() {
             console.log('init...')
+            UICtrl.displayBudget({
+                budget: 0,
+                totalInc: 0,
+                totalExp: 0,
+                percentage: 0
+            })
             setupEventListeners()
         }
     }
@@ -180,5 +202,3 @@ var controller = ((budgetCtrl, UICtrl) => {
 })(budgetController, UIController)
 
 controller.init()
-
-// Finish 77
