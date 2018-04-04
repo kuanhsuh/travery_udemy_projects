@@ -128,6 +128,22 @@ var UIController = (() => {
         container: '.container',
         expensesPercLabel: '.item__percentage'
     }
+
+    var formatNumber = (num, type) => {
+        var numSplit, int, dec, type
+        // 2 decimal place
+        // comma separating the thousands
+        num = Math.abs(num)
+        num = num.toFixed(2)
+        numSplit = num.split('.')
+        int = numSplit[0]
+        dec = numSplit[1]
+        if (int.length > 3) {
+            int = int.substr(0,int.length - 3) + ',' + int.substr(int.length - 3, int.length)
+        }
+        dec = numSplit[1]
+        return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec
+    }
     return {
         getinput() {
             return {
@@ -149,7 +165,7 @@ var UIController = (() => {
             // Replace the placeholder text with some actual data
             newHtml = html.replace('%id%', obj.id)
             newHtml = newHtml.replace('%description%', obj.description)
-            newHtml = newHtml.replace('%value%', obj.value)
+            newHtml = newHtml.replace('%value%', formatNumber(obj.value), type)
             // Insert HTML into DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml)
         },
@@ -168,9 +184,10 @@ var UIController = (() => {
             fieldsArr[0].focus()
         },
         displayBudget(obj) {
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc
-            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExp
+            obj.budget > 0 ? type = 'inc' : type = 'exp'
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, 'inc')
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, type)
+            document.querySelector(DOMstrings.expensesLabel).textContent = formatNumber(obj.totalExp, 'exp')
             document.querySelector(DOMstrings.percentagelabel).textContent = obj.percentage
 
             if (obj.percentage > 0) {
