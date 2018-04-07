@@ -126,7 +126,8 @@ var UIController = (() => {
         expensesLabel: '.budget__expenses--value',
         percentagelabel: '.budget__expenses--percentage',
         container: '.container',
-        expensesPercLabel: '.item__percentage'
+        expensesPercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
     }
 
     var formatNumber = (num, type) => {
@@ -143,6 +144,11 @@ var UIController = (() => {
         }
         dec = numSplit[1]
         return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec
+    }
+    var nodeListForEach = (list, cb) => {
+        for( var i = 0; i < list.length; i++) {
+            cb(list[i], i)
+        }
     }
     return {
         getinput() {
@@ -198,11 +204,6 @@ var UIController = (() => {
         },
         displayPercentages(percentages) {
             var fields = document.querySelectorAll(DOMstrings.expensesPercLabel)
-            var nodeListForEach = (list, cb) => {
-                for( var i = 0; i < list.length; i++) {
-                    cb(list[i], i)
-                }
-            }
             nodeListForEach(fields, function(current, index) {
                 if (percentages[index] > 0) {
                     current.textContent = percentages[index] + '%'
@@ -210,6 +211,24 @@ var UIController = (() => {
                     current.textContent = '---'
                 }
             })
+        },
+        displayMonth() {
+            var now, year, month, months
+            now = new Date()
+            year = now.getFullYear()
+            months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            month = now.getMonth()
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year
+        },
+        changedType() {
+            var fields = document.querySelectorAll(
+                (DOMstrings.inputType + ',' + DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue)
+            )
+            nodeListForEach(fields, (cur) => {
+                cur.classList.toggle('red-focus')
+            })
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red')
         },
         getDOMstrings() {
             return DOMstrings
@@ -229,6 +248,7 @@ var controller = ((budgetCtrl, UICtrl) => {
             }
         })
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem)
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType)
     }
 
 
@@ -287,6 +307,7 @@ var controller = ((budgetCtrl, UICtrl) => {
     return {
         init() {
             console.log('init...')
+            UICtrl.displayMonth()
             UICtrl.displayBudget({
                 budget: 0,
                 totalInc: 0,
